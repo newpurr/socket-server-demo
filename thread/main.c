@@ -12,9 +12,9 @@
 #include <pthread.h>
 
 typedef struct SockInfo {
-    int fd;// 文件描述符
-    struct sockaddr_in addr; // IP地址
-    pthread_t id; // 线程ID
+    int fd;                   // 文件描述符
+    struct sockaddr_in addr;  // IP地址
+    pthread_t id;             // 线程ID
 } SockInfo;
 
 void *workerFunc(void *arg) {
@@ -24,7 +24,7 @@ void *workerFunc(void *arg) {
     while (1) {
         printf("client IP: %s Port:%d\n", inet_ntop(AF_INET, &info->addr.sin_addr.s_addr, ip, sizeof(ip)),
                ntohs(info->addr.sin_port));
-        
+
         char buf[1024];
 
         int len = read(info->fd, buf, sizeof(buf));
