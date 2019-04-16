@@ -70,7 +70,6 @@ int main(int argc, const char *argv[]) {
     listen(listen_fd, 36);
     printf("start accept ... \n");
 
-    struct sockaddr_in client_addr;
     socklen_t client_len = sizeof(struct sockaddr_in);
 
     int i = 0;

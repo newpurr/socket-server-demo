@@ -3,7 +3,7 @@
  *
  *       Filename:  tcp_server_epoll.c
  *
- *    Description:  
+ *    Description:
  *
  *        Version:  1.0
  *        Created:  10/25/2014 10:01:03 PM
@@ -11,7 +11,7 @@
  *       Compiler:  gcc
  *
  *         Author:  Wei Yang (weiyang), weiyang.kernel@gmail.com
- *        Company:  
+ *        Company:
  *
  * =====================================================================================
  */
@@ -53,8 +53,7 @@ static void socket_create_bind_local() {
     server_addr.sin_addr.s_addr = INADDR_ANY;
     bzero(&(server_addr.sin_zero), 8);
 
-    if (bind(socket_fd, (struct sockaddr *) & server_addr, sizeof(struct sockaddr))
-        == -1) {
+    if (bind(socket_fd, (struct sockaddr *) & server_addr, sizeof(struct sockaddr)) == -1) {
         perror("Unable to bind");
         exit(1);
     }
@@ -91,7 +90,7 @@ void accept_and_add_new() {
         if (getnameinfo(&in_addr, in_len,
                         hbuf, sizeof(hbuf),
                         sbuf, sizeof(sbuf),
-                        NI_NUMERICHOST | NI_NUMERICHOST) == 0) {
+                        NI_NUMERICHOST) == 0) {
             printf("Accepted connection on descriptor %d (host=%s, port=%s)\n",
                    infd, hbuf, sbuf);
         }

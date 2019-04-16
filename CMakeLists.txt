@@ -5,6 +5,7 @@ set(CMAKE_C_STANDARD 99)
 
 add_executable(epoll epoll/main.c)
 add_executable(process process/main.c)
+add_executable(reactor reactor/main.c)
 add_executable(ipcserver socket-ipc/server.c)
 add_executable(ipcclient socket-ipc/client.c)
 
