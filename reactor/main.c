@@ -9,7 +9,7 @@
 #include <time.h>
 #include <errno.h>
 
-#define SERV_PORT   6608
+#define SERV_PORT   6609
 #define MAX_EVENTS  1024
 #define BUFLEN      4096
 
@@ -24,25 +24,13 @@ struct myevent_s {
     int events;                                           // 监听的事件
     void *arg;                                            // 泛型参数
     void (*call_back)(int fd, int events, void *arg);     // 回调函数指针
-    int status;                                          // 状态
-    char buf[BUFLEN];                                     // 缓冲区
-    int len;                                             // buf存放的有效字节数
+    int status;                                           // 状态
+    char buf[BUFLEN];                                   // 缓冲区
+    int len;                                              // buf存放的有效字节数
     long last_active;                                     // 最后操作文件描述符的事件
 };
 
 struct myevent_s g_events[MAX_EVENTS + 1];
-
-/*void eventSet(struct myevent_s *ev, int fd, void (*call_back)(int, int, void *), void *arg) {
-
-
-    sin.sin_addr.s_addr = INADDR_ANY;
-    sin.sin_port = htons(port);
-
-    bind(lfd, (struct sockaddr *) &sin, sizeof(sin));
-
-    listen(lfd, 20);
-    return;
-}*/
 
 void eventAdd(int efd, int events, struct myevent_s *ev) {
     struct epoll_event epv;
@@ -166,7 +154,6 @@ void recvdata(int fd, int events, void *arg)
 
     if (len > 0) {
         ev->len = len;
-        ev->buf[len] = "\0";
         printf("C[%d]:%s\n", fd, ev->buf);
 
         eventSet(ev, fd, senddata, ev);
@@ -183,7 +170,20 @@ void recvdata(int fd, int events, void *arg)
 
 void senddata(int fd, int events, void *arg)
 {
-    printf("this is send data\n");
+    struct myevent_s *ev = (struct myevent_s *) arg;
+
+    int len = send(fd, ev->buf, ev->len, 0);
+
+    if (len > 0) {
+        printf("send [fd=%d], [%d]%s\n", fd, len, ev->buf);
+        eventDel(g_efd, ev);                                   // 从epoll红黑树上删除当前fd监听
+        eventSet(ev, fd, recvdata, ev);                        // 将该fd的回调函数修改为recvdata
+        eventAdd(g_efd, EPOLLIN, ev);                          // 重新添加到红黑树上，设置监听事件
+    } else {
+        close(ev->fd);                                         // 关闭连接
+        eventDel(g_efd, ev);                                   // 从epoll红黑树上删除当前fd监听
+        printf("send[fd=%d] error %s\n", fd, strerror(errno));
+    }
 }
 
 int main(int argc, char *argv[]) {
